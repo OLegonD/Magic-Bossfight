@@ -3,6 +3,7 @@ namespace SpriteKind {
     export const player2 = SpriteKind.create()
     export const secretweapon = SpriteKind.create()
     export const heal = SpriteKind.create()
+    export const pro3 = SpriteKind.create()
 }
 scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile1`, function (sprite, location) {
     mySprite.setPosition(randint(0, 160), randint(160, 0))
@@ -254,7 +255,7 @@ controller.left.onEvent(ControllerButtonEvent.Released, function () {
         . . . . . . f f f . . . . . . . 
         `],
     100,
-    true
+    false
     )
 })
 scene.onOverlapTile(SpriteKind.player2, assets.tile`myTile1`, function (sprite, location) {
@@ -266,9 +267,6 @@ statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
 scene.onOverlapTile(SpriteKind.player2, assets.tile`myTile`, function (sprite, location) {
     mySprite4.setPosition(randint(0, 160), randint(160, 0))
 })
-function beat () {
-	
-}
 controller.B.onEvent(ControllerButtonEvent.Repeated, function () {
     mySprite.startEffect(effects.halo, 1500)
     count += 1
@@ -359,9 +357,16 @@ sprites.onOverlap(SpriteKind.Projectile, SpriteKind.pro2, function (sprite, othe
         music.playSoundEffect(music.createSoundEffect(WaveShape.Triangle, 330, 1, 255, 0, 300, SoundExpressionEffect.None, InterpolationCurve.Linear), SoundExpressionPlayMode.InBackground)
     }
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.pro3, function (sprite, otherSprite) {
+    otherSprite.destroy(effects.fire, 500)
+    info.changeLifeBy(-10)
+    if (Soundeffects == 1) {
+        music.playSoundEffect(music.createSoundEffect(WaveShape.Square, 200, 330, 255, 0, 400, SoundExpressionEffect.Warble, InterpolationCurve.Curve), SoundExpressionPlayMode.InBackground)
+    }
+})
 controller.down.onEvent(ControllerButtonEvent.Repeated, function () {
     mySprite.startEffect(effects.halo, 1500)
-    count2 += 1
+    count2 += 10
 })
 sprites.onOverlap(SpriteKind.heal, SpriteKind.Player, function (sprite, otherSprite) {
     info.changeLifeBy(1)
@@ -377,8 +382,15 @@ sprites.onOverlap(SpriteKind.heal, SpriteKind.player2, function (sprite, otherSp
         music.playSoundEffect(music.createSoundEffect(WaveShape.Square, 1, 5000, 255, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), SoundExpressionPlayMode.InBackground)
     }
 })
+let beat2 = 0
 let projectile3: Sprite = null
 let projectile2: Sprite = null
+let playing2 = false
+let playing3 = false
+let playing4 = false
+let beat = 0
+let phase = 0
+let count = 0
 let projectile: Sprite = null
 let statusbar: StatusBarSprite = null
 let mySprite4: Sprite = null
@@ -388,9 +400,8 @@ let count2 = 0
 let Facing = 0
 let speed = 100
 Facing = 0
-let count = 0
 count2 = 0
-let phase = 0
+Soundeffects = 1
 scene.setBackgroundImage(img`
     9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999966666699969999999999999999999999999999999999999999999999999999
     9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
@@ -519,14 +530,6 @@ game.showLongText("You cast a projectile spell with A button (jump to reset aim)
 game.showLongText("You move player 2 with player 2 arrow keys. You teleport player 1 with A button. If you hover over the boss and press B the boss loses HP.", DialogLayout.Bottom)
 game.showLongText("Hit hearts to get more hp.", DialogLayout.Bottom)
 game.showLongText("Its 4 phases you win if you don't beat the boss and the phases run out you lose.", DialogLayout.Bottom)
-game.showLongText("Sound Effects? Obs please do not use other buttons then A or Up/down in the choice!", DialogLayout.Bottom)
-story.showPlayerChoices("on", "off")
-if (story.checkLastAnswer("on")) {
-    Soundeffects = 1
-}
-if (story.checkLastAnswer("off")) {
-    Soundeffects = 0
-}
 game.showLongText("Good luck!", DialogLayout.Bottom)
 info.setLife(100)
 mySprite = sprites.create(img`
@@ -744,8 +747,50 @@ mySprite3.setPosition(106, 15)
 statusbar.attachToSprite(mySprite3)
 statusbar.max = 300
 statusbar.value = 300
-beat()
-game.onUpdateInterval(1, function () {
+let tempo = 160
+let tempo2 = tempo * 2
+music.setVolume(255)
+const hihat = new music.Melody("@0,50,0,0 ~5 c8-" + tempo + " c8 c c c c c @0,250,0,0 c")
+const drums = new music.Melody(
+    "@0,75,0,50 ~16 g1-" + tempo2 + " g R g " +
+    "@10,75,0,0 ~4 g5 @0,75,0,50 ~16 g1 R g g R g R" +
+    "@10,75,0,0 ~4 g5 R @0,75,0,50 ~16 g1 R")
+const b1 = new music.Melody("@0,75,50,50 ~15 e1-" + tempo + " e e e e e e e# e e e e e b a# a")
+let positions = [0, 0, 0]
+let lengths = [1, 1, 2]
+let volumes = [200, 200, 200]
+let tracks = [[hihat], [drums], [b1]]
+let tempo3 = 180
+let tempo4 = tempo3 * 2
+const hihat2 = new music.Melody("@0,50,0,0 ~5 c8-" + tempo3 + " c8 c c c c c @0,250,0,0 c")
+const drums2 = new music.Melody(
+    "@0,75,0,50 ~16 g1-" + tempo4 + " g R g " +
+    "@10,75,0,0 ~4 g5 @0,75,0,50 ~16 g1 R g g R g R" +
+    "@10,75,0,0 ~4 g5 R @0,75,0,50 ~16 g1 R")
+const b2 = new music.Melody("@0,75,50,50 ~15 e1-" + tempo3 + " e e e e e e e# e e e e e b a# a")
+let tracks2 = [[hihat2], [drums2], [b2]]
+let beat3 = 0
+let tempo5 = 210
+let tempo6 = tempo5 * 2
+const hihat3 = new music.Melody("@0,50,0,0 ~5 c8-" + tempo5 + " c8 c c c c c @0,250,0,0 c")
+const drums3 = new music.Melody(
+    "@0,75,0,50 ~16 g1-" + tempo6 + " g R g " +
+    "@10,75,0,0 ~4 g5 @0,75,0,50 ~16 g1 R g g R g R" +
+    "@10,75,0,0 ~4 g5 R @0,75,0,50 ~16 g1 R")
+const b3 = new music.Melody("@0,75,50,50 ~15 e1-" + tempo5 + " e e e e e e e# e e e e e b a# a")
+let tracks3 = [[hihat3], [drums3], [b3]]
+let beat4 = 0
+let tempo7 = 240
+let tempo8 = tempo7 * 2
+const hihat4 = new music.Melody("@0,50,0,0 ~5 c8-" + tempo7 + " c8 c c c c c @0,250,0,0 c")
+const drums4 = new music.Melody(
+    "@0,75,0,50 ~16 g1-" + tempo8 + " g R g " +
+    "@10,75,0,0 ~4 g5 @0,75,0,50 ~16 g1 R g g R g R" +
+    "@10,75,0,0 ~4 g5 R @0,75,0,50 ~16 g1 R")
+const b4 = new music.Melody("@0,75,50,50 ~15 e1-" + tempo7 + " e e e e e e e# e e e e e b a# a")
+let tracks4 = [[hihat4], [drums4], [b4]]
+let playing = true
+game.onUpdate(function () {
     if (mySprite2.isHittingTile(CollisionDirection.Right)) {
         if (phase < 10) {
             speed = -100
@@ -753,7 +798,7 @@ game.onUpdateInterval(1, function () {
             speed = -200
         }
         mySprite2.vx = speed
-        mySprite2.vy += -220
+        mySprite2.vy += -400
         phase += 1
     }
     if (mySprite2.isHittingTile(CollisionDirection.Left)) {
@@ -763,8 +808,23 @@ game.onUpdateInterval(1, function () {
             speed = 200
         }
         mySprite2.vx = speed
-        mySprite2.vy += -220
+        mySprite2.vy += -400
     }
+})
+game.onUpdateInterval(1000 * 60 / tempo * 8, function () {
+    if (!(playing)) {
+        return
+    }
+    for (let track = 0; track <= 2; track++) {
+        if (beat % lengths[track] == 0) {
+            tracks[track][positions[track]].play(volumes[track])
+++positions[track]
+if (positions[track] >= tracks[track].length) {
+                positions[track] = 0
+            }
+        }
+    }
+    beat += 1
 })
 forever(function () {
     if (count == 55) {
@@ -777,10 +837,16 @@ forever(function () {
         }
         count = 0
     }
-    if (phase >= 5) {
+    if (phase == 5) {
         mySprite2.ay = -500
+        playing = false
+        music.stopAllSounds()
+        playing2 = true
     }
     if (phase == 10) {
+        playing2 = false
+        music.stopAllSounds()
+        playing3 = true
         if (Soundeffects == 1) {
             music.playSoundEffect(music.createSoundEffect(WaveShape.Sawtooth, 1, 1, 255, 0, 500, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), SoundExpressionPlayMode.InBackground)
         }
@@ -910,6 +976,9 @@ forever(function () {
         phase += 1
     }
     if (phase == 21) {
+        playing3 = false
+        music.stopAllSounds()
+        playing4 = true
         if (Soundeffects == 1) {
             music.playSoundEffect(music.createSoundEffect(WaveShape.Sawtooth, 1, 1, 255, 0, 500, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), SoundExpressionPlayMode.InBackground)
         }
@@ -1048,80 +1117,127 @@ forever(function () {
         game.over(false)
     }
 })
-game.onUpdateInterval(500, function () {
-    if (Soundeffects == 1) {
-        music.playSoundEffect(music.createSoundEffect(WaveShape.Square, 1088, 1, 255, 0, 200, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), SoundExpressionPlayMode.InBackground)
-    }
-    projectile2 = sprites.createProjectileFromSprite(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . 2 1 2 . . . . . . 
-        . . . . . . . 2 1 2 . . . . . . 
-        . . . . . . . 2 1 2 . . . . . . 
-        . . . . . . . 3 1 3 . . . . . . 
-        . . . . . . 2 3 1 3 2 . . . . . 
-        . . . . . . 2 1 1 1 2 . . . . . 
-        . . . . . . 2 1 1 1 3 . . . . . 
-        . . . . . . 3 1 1 1 3 . . . . . 
-        . . . . . . 3 1 1 1 3 . . . . . 
-        . . . . . . 3 1 1 1 3 . . . . . 
-        . . . . . . 2 3 1 3 2 . . . . . 
-        . . . . . . . 2 2 2 . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `, mySprite2, 0, 200)
-    projectile2.setKind(SpriteKind.pro2)
-    if (Math.percentChance(10)) {
+game.onUpdateInterval(100, function () {
+    if (Math.percentChance(40)) {
         if (Soundeffects == 1) {
-            music.playSoundEffect(music.createSoundEffect(WaveShape.Square, 1088, 1, 255, 0, 200, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), SoundExpressionPlayMode.InBackground)
+            music.playSoundEffect(music.createSoundEffect(WaveShape.Square, 1088, 1, 130, 0, 200, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), SoundExpressionPlayMode.InBackground)
         }
-        projectile3 = sprites.createProjectileFromSprite(img`
+        projectile2 = sprites.createProjectileFromSprite(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . 2 1 2 . . . . . . 
+            . . . . . . . 2 1 2 . . . . . . 
+            . . . . . . . 2 1 2 . . . . . . 
+            . . . . . . . 3 1 3 . . . . . . 
+            . . . . . . 2 3 1 3 2 . . . . . 
+            . . . . . . 2 1 1 1 2 . . . . . 
+            . . . . . . 2 1 1 1 3 . . . . . 
+            . . . . . . 3 1 1 1 3 . . . . . 
+            . . . . . . 3 1 1 1 3 . . . . . 
+            . . . . . . 3 1 1 1 3 . . . . . 
+            . . . . . . 2 3 1 3 2 . . . . . 
+            . . . . . . . 2 2 2 . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
             . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . f f f . f f f . . . . 
-            . . . . f 3 3 3 f 3 3 3 f . . . 
-            . . . . f 3 3 3 3 3 1 3 f . . . 
-            . . . . f 3 3 3 3 3 3 3 f . . . 
-            . . . . . f 3 b b b 3 f . . . . 
-            . . . . . f f b b b f f . . . . 
-            . . . . . . f f b f f . . . . . 
-            . . . . . . . f f f . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `, mySprite2, 0, 200)
-        projectile2.destroy(effects.hearts, 500)
-        scaling.scaleByPixels(projectile2, 10, ScaleDirection.Uniformly, ScaleAnchor.Middle)
-        projectile2.setKind(SpriteKind.heal)
-    }
-    if (Math.percentChance(10)) {
-        if (phase >= 5) {
+            `, mySprite2, randint(-100, 100), 200)
+        projectile2.setKind(SpriteKind.pro2)
+        if (Math.percentChance(10)) {
             if (Soundeffects == 1) {
                 music.playSoundEffect(music.createSoundEffect(WaveShape.Square, 1088, 1, 255, 0, 200, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), SoundExpressionPlayMode.InBackground)
             }
-            projectile2 = sprites.createProjectileFromSprite(img`
+            projectile3 = sprites.createProjectileFromSprite(img`
                 . . . . . . . . . . . . . . . . 
-                . . . . . . . 2 1 2 . . . . . . 
-                . . . . . . . 2 1 2 . . . . . . 
-                . . . . . . . 2 1 2 . . . . . . 
-                . . . . . . . 3 1 3 . . . . . . 
-                . . . . . . 2 3 1 3 2 . . . . . 
-                . . . . . . 2 1 1 1 2 . . . . . 
-                . . . . . . 2 1 1 1 3 . . . . . 
-                . . . . . . 3 1 1 1 3 . . . . . 
-                . . . . . . 3 1 1 1 3 . . . . . 
-                . . . . . . 3 1 1 1 3 . . . . . 
-                . . . . . . 2 3 1 3 2 . . . . . 
-                . . . . . . . 2 2 2 . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . f f f . f f f . . . . 
+                . . . . f 3 3 3 f 3 3 3 f . . . 
+                . . . . f 3 3 3 3 3 1 3 f . . . 
+                . . . . f 3 3 3 3 3 3 3 f . . . 
+                . . . . . f 3 b b b 3 f . . . . 
+                . . . . . f f b b b f f . . . . 
+                . . . . . . f f b f f . . . . . 
+                . . . . . . . f f f . . . . . . 
                 . . . . . . . . . . . . . . . . 
                 . . . . . . . . . . . . . . . . 
                 . . . . . . . . . . . . . . . . 
                 `, mySprite2, 0, 200)
-            projectile2.setKind(SpriteKind.pro2)
-            scaling.scaleByPixels(projectile2, 100, ScaleDirection.Uniformly, ScaleAnchor.Middle)
+            projectile2.destroy(effects.hearts, 500)
+            scaling.scaleByPixels(projectile2, 10, ScaleDirection.Uniformly, ScaleAnchor.Middle)
+            projectile2.setKind(SpriteKind.heal)
+        }
+        if (Math.percentChance(10)) {
+            if (phase >= 5) {
+                if (Soundeffects == 1) {
+                    music.playSoundEffect(music.createSoundEffect(WaveShape.Noise, 464, 286, 255, 255, 400, SoundExpressionEffect.Tremolo, InterpolationCurve.Logarithmic), SoundExpressionPlayMode.InBackground)
+                }
+                projectile2 = sprites.createProjectileFromSprite(img`
+                    . . . . . . . . . . . . . . . . 
+                    . . . . . . . 2 1 2 . . . . . . 
+                    . . . . . . . 2 1 2 . . . . . . 
+                    . . . . . . . 2 1 2 . . . . . . 
+                    . . . . . . . 3 1 3 . . . . . . 
+                    . . . . . . 2 3 1 3 2 . . . . . 
+                    . . . . . . 2 1 1 1 2 . . . . . 
+                    . . . . . . 2 1 1 1 3 . . . . . 
+                    . . . . . . 3 1 1 1 3 . . . . . 
+                    . . . . . . 3 1 1 1 3 . . . . . 
+                    . . . . . . 3 1 1 1 3 . . . . . 
+                    . . . . . . 2 3 1 3 2 . . . . . 
+                    . . . . . . . 2 2 2 . . . . . . 
+                    . . . . . . . . . . . . . . . . 
+                    . . . . . . . . . . . . . . . . 
+                    . . . . . . . . . . . . . . . . 
+                    `, mySprite2, randint(-100, 100), 200)
+                projectile2.setKind(SpriteKind.pro3)
+                scaling.scaleByPixels(projectile2, 100, ScaleDirection.Uniformly, ScaleAnchor.Middle)
+            }
         }
     }
+})
+game.onUpdateInterval(1000 * 60 / tempo3 * 8, function () {
+    if (!(playing2)) {
+        return
+    }
+    for (let track = 0; track <= 2; track++) {
+        if (beat2 % lengths[track] == 0) {
+            tracks2[track][positions[track]].play(volumes[track])
+            ++positions[track]
+            if (positions[track] >= tracks2[track].length) {
+                positions[track] = 0
+            }
+        }
+    }
+    beat2 += 1
+})
+game.onUpdateInterval(1000 * 60 / tempo5 * 8, function () {
+    if (!(playing3)) {
+        return
+    }
+    for (let track = 0; track <= 2; track++) {
+        if (beat3 % lengths[track] == 0) {
+            tracks3[track][positions[track]].play(volumes[track])
+            ++positions[track]
+            if (positions[track] >= tracks3[track].length) {
+                positions[track] = 0
+            }
+        }
+    }
+    beat3 += 1
+})
+game.onUpdateInterval(1000 * 60 / tempo7 * 8, function () {
+    if (!(playing4)) {
+        return
+    }
+    for (let track = 0; track <= 2; track++) {
+        if (beat4 % lengths[track] == 0) {
+            tracks4[track][positions[track]].play(volumes[track])
+            ++positions[track]
+            if (positions[track] >= tracks4[track].length) {
+                positions[track] = 0
+            }
+        }
+    }
+    beat4 += 1
 })
