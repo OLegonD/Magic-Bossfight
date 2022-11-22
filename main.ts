@@ -386,8 +386,10 @@ let beat2 = 0
 let projectile3: Sprite = null
 let projectile2: Sprite = null
 let playing2 = false
-let playing3 = false
+let beat4 = 0
 let playing4 = false
+let beat3 = 0
+let playing3 = false
 let beat = 0
 let phase = 0
 let count = 0
@@ -759,7 +761,7 @@ const b1 = new music.Melody("@0,75,50,50 ~15 e1-" + tempo + " e e e e e e e# e e
 let positions = [0, 0, 0]
 let lengths = [1, 1, 2]
 let volumes = [200, 200, 200]
-let tracks = [[hihat], [drums], [b1]]
+let tracks: Array[] = [[hihat], [drums], [b1]]
 let tempo3 = 180
 let tempo4 = tempo3 * 2
 const hihat2 = new music.Melody("@0,50,0,0 ~5 c8-" + tempo3 + " c8 c c c c c @0,250,0,0 c")
@@ -768,8 +770,7 @@ const drums2 = new music.Melody(
     "@10,75,0,0 ~4 g5 @0,75,0,50 ~16 g1 R g g R g R" +
     "@10,75,0,0 ~4 g5 R @0,75,0,50 ~16 g1 R")
 const b2 = new music.Melody("@0,75,50,50 ~15 e1-" + tempo3 + " e e e e e e e# e e e e e b a# a")
-let tracks2 = [[hihat2], [drums2], [b2]]
-let beat3 = 0
+let tracks2: Array[] = [[hihat2], [drums2], [b2]]
 let tempo5 = 210
 let tempo6 = tempo5 * 2
 const hihat3 = new music.Melody("@0,50,0,0 ~5 c8-" + tempo5 + " c8 c c c c c @0,250,0,0 c")
@@ -778,8 +779,7 @@ const drums3 = new music.Melody(
     "@10,75,0,0 ~4 g5 @0,75,0,50 ~16 g1 R g g R g R" +
     "@10,75,0,0 ~4 g5 R @0,75,0,50 ~16 g1 R")
 const b3 = new music.Melody("@0,75,50,50 ~15 e1-" + tempo5 + " e e e e e e e# e e e e e b a# a")
-let tracks3 = [[hihat3], [drums3], [b3]]
-let beat4 = 0
+let tracks3: Array[] = [[hihat3], [drums3], [b3]]
 let tempo7 = 240
 let tempo8 = tempo7 * 2
 const hihat4 = new music.Melody("@0,50,0,0 ~5 c8-" + tempo7 + " c8 c c c c c @0,250,0,0 c")
@@ -788,7 +788,7 @@ const drums4 = new music.Melody(
     "@10,75,0,0 ~4 g5 @0,75,0,50 ~16 g1 R g g R g R" +
     "@10,75,0,0 ~4 g5 R @0,75,0,50 ~16 g1 R")
 const b4 = new music.Melody("@0,75,50,50 ~15 e1-" + tempo7 + " e e e e e e e# e e e e e b a# a")
-let tracks4 = [[hihat4], [drums4], [b4]]
+let tracks4: Array[] = [[hihat4], [drums4], [b4]]
 let playing = true
 game.onUpdate(function () {
     if (mySprite2.isHittingTile(CollisionDirection.Right)) {
@@ -825,6 +825,36 @@ if (positions[track] >= tracks[track].length) {
         }
     }
     beat += 1
+})
+game.onUpdateInterval(1000 * 60 / tempo5 * 8, function () {
+    if (!(playing3)) {
+        return
+    }
+    for (let track3 = 0; track3 <= 2; track3++) {
+        if (beat3 % lengths[track3] == 0) {
+            tracks3[track3][positions[track3]].play(volumes[track3])
+++positions[track3]
+if (positions[track3] >= tracks3[track3].length) {
+                positions[track3] = 0
+            }
+        }
+    }
+    beat3 += 1
+})
+game.onUpdateInterval(1000 * 60 / tempo7 * 8, function () {
+    if (!(playing4)) {
+        return
+    }
+    for (let track4 = 0; track4 <= 2; track4++) {
+        if (beat4 % lengths[track4] == 0) {
+            tracks4[track4][positions[track4]].play(volumes[track4])
+++positions[track4]
+if (positions[track4] >= tracks4[track4].length) {
+                positions[track4] = 0
+            }
+        }
+    }
+    beat4 += 1
 })
 forever(function () {
     if (count == 55) {
@@ -1200,44 +1230,14 @@ game.onUpdateInterval(1000 * 60 / tempo3 * 8, function () {
     if (!(playing2)) {
         return
     }
-    for (let track = 0; track <= 2; track++) {
-        if (beat2 % lengths[track] == 0) {
-            tracks2[track][positions[track]].play(volumes[track])
-            ++positions[track]
-            if (positions[track] >= tracks2[track].length) {
-                positions[track] = 0
+    for (let track2 = 0; track2 <= 2; track2++) {
+        if (beat2 % lengths[track2] == 0) {
+            tracks2[track2][positions[track2]].play(volumes[track2])
+++positions[track2]
+if (positions[track2] >= tracks2[track2].length) {
+                positions[track2] = 0
             }
         }
     }
     beat2 += 1
-})
-game.onUpdateInterval(1000 * 60 / tempo5 * 8, function () {
-    if (!(playing3)) {
-        return
-    }
-    for (let track = 0; track <= 2; track++) {
-        if (beat3 % lengths[track] == 0) {
-            tracks3[track][positions[track]].play(volumes[track])
-            ++positions[track]
-            if (positions[track] >= tracks3[track].length) {
-                positions[track] = 0
-            }
-        }
-    }
-    beat3 += 1
-})
-game.onUpdateInterval(1000 * 60 / tempo7 * 8, function () {
-    if (!(playing4)) {
-        return
-    }
-    for (let track = 0; track <= 2; track++) {
-        if (beat4 % lengths[track] == 0) {
-            tracks4[track][positions[track]].play(volumes[track])
-            ++positions[track]
-            if (positions[track] >= tracks4[track].length) {
-                positions[track] = 0
-            }
-        }
-    }
-    beat4 += 1
 })
